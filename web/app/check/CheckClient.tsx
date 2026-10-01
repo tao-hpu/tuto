@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_CHECK_API || "https://api.tuto.fim.ai";
+const API_BASE = process.env.NEXT_PUBLIC_CHECK_API || "https://api.tuto.fim.ai";
 
 type Job = {
   job_id: string;
@@ -81,10 +80,6 @@ const STAGES: { key: string; label: string }[] = [
 const EXAMPLES: { id: string; label: string }[] = [
   { id: "1706.03762", label: "Attention Is All You Need" },
   { id: "1810.04805", label: "BERT" },
-  { id: "1512.03385", label: "ResNet" },
-  { id: "2005.14165", label: "GPT-3" },
-  { id: "2203.02155", label: "InstructGPT" },
-  { id: "2106.09685", label: "LoRA" },
   { id: "2310.06825", label: "Mistral 7B" },
 ];
 
@@ -144,7 +139,7 @@ export default function CheckClient() {
   const result = job?.status === "done" ? job.result : undefined;
   const stageIdx = Math.max(
     0,
-    STAGES.findIndex((s) => s.key === job?.stage)
+    STAGES.findIndex((s) => s.key === job?.stage),
   );
 
   return (
@@ -156,21 +151,27 @@ export default function CheckClient() {
           doSubmit(input);
         }}
       >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="arXiv id or URL, e.g. 2405.12345"
-          aria-label="arXiv id or URL"
-          disabled={!!running || submitting}
-        />
-        <button
-          type="submit"
-          className="btn"
-          disabled={!input.trim() || !!running || submitting}
-        >
-          {running ? "Running…" : "Check citations"}
-        </button>
+        <label className="check-field-label" htmlFor="arxiv-input">
+          Paper to check
+        </label>
+        <div className="check-form-row">
+          <input
+            id="arxiv-input"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="arXiv ID or URL, e.g. 2405.12345"
+            autoComplete="off"
+            disabled={!!running || submitting}
+          />
+          <button
+            type="submit"
+            className="btn"
+            disabled={!input.trim() || !!running || submitting}
+          >
+            {running ? "Running…" : "Check citations"}
+          </button>
+        </div>
       </form>
 
       <div className="check-examples">
@@ -191,10 +192,14 @@ export default function CheckClient() {
         ))}
       </div>
 
-      {error && <p className="check-error">{error}</p>}
+      {error && (
+        <p className="check-error" role="alert">
+          {error}
+        </p>
+      )}
 
       {running && (
-        <div className="check-progress">
+        <div className="check-progress" aria-live="polite">
           {job.status === "queued" ? (
             <p>
               {job.queue_ahead
@@ -237,7 +242,7 @@ export default function CheckClient() {
                 <div
                   className="check-bar-fill"
                   style={{
-                    width: `${((stageIdx + 1) / STAGES.length) * 100}%`,
+                    transform: `scaleX(${(stageIdx + 1) / STAGES.length})`,
                   }}
                 />
               </div>
@@ -290,15 +295,15 @@ function Result({ r }: { r: CheckResult }) {
   const residue: string[] = [];
   if (nonPaper)
     residue.push(
-      `${nonPaper} ${nonPaper === 1 ? "is not a paper" : "are not papers"} at all (a URL, software, a dataset)`
+      `${nonPaper} ${nonPaper === 1 ? "is not a paper" : "are not papers"} at all (a URL, software, a dataset)`,
     );
   if (garbled)
     residue.push(
-      `${garbled} ${garbled === 1 ? "was" : "were"} too garbled to parse`
+      `${garbled} ${garbled === 1 ? "was" : "were"} too garbled to parse`,
     );
   if (indexGap)
     residue.push(
-      `${indexGap} ${indexGap === 1 ? "is a real paper" : "are real papers"} our indexes simply lack, by triage's reading`
+      `${indexGap} ${indexGap === 1 ? "is a real paper" : "are real papers"} our indexes simply lack, by triage's reading`,
     );
   if (suspicious)
     residue.push(`${suspicious} looked suspicious enough to list below`);
@@ -372,7 +377,10 @@ function Result({ r }: { r: CheckResult }) {
                 the paper.{" "}
               </>
             ) : (
-              <>Every entry in the bibliography resolved to a paper that exists.{" "}</>
+              <>
+                Every entry in the bibliography resolved to a paper that
+                exists.{" "}
+              </>
             )}
             Only matched references get their claims read, so anything below is
             drawn from these {matched}.
@@ -426,7 +434,8 @@ function Result({ r }: { r: CheckResult }) {
         ACL 2026 audit the first-pass detector was 13% precise before
         arbitration, and only 2 of 12 human-reviewed existence leads were real.
         Every lead below already survived a second-stage review that tried to
-        refute it{l2.refuted_by_arbiter > 0 && (
+        refute it
+        {l2.refuted_by_arbiter > 0 && (
           <>
             {" "}
             ({l2.refuted_by_arbiter} first-pass{" "}
@@ -434,16 +443,16 @@ function Result({ r }: { r: CheckResult }) {
             and discarded)
           </>
         )}
-        . Read the{" "}
-        <a href="/report">methodology</a> before acting on any of them.
+        . Read the <a href="/report">methodology</a> before acting on any of
+        them.
       </p>
 
       {clean && (
         <p className="check-clean">
           No leads. Every checkable reference resolved, and no claim citation
           was confirmed unsupported. This does not certify the paper: nominal
-          citations, unverifiable claims, and references outside our indexes
-          are out of scope.
+          citations, unverifiable claims, and references outside our indexes are
+          out of scope.
         </p>
       )}
 
@@ -468,9 +477,9 @@ function Result({ r }: { r: CheckResult }) {
         <section>
           <h3>Support leads</h3>
           <p className="check-note">
-            Claim citations where the cited paper, read in full where
-            available, did not appear to back the claim, confirmed by a
-            second-stage reviewer instructed to refute the flag.
+            Claim citations where the cited paper, read in full where available,
+            did not appear to back the claim, confirmed by a second-stage
+            reviewer instructed to refute the flag.
           </p>
           {r.leads.support.map((l, i) => (
             <div className="check-lead" key={i}>

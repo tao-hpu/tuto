@@ -1,6 +1,7 @@
 # Citation Integrity at ACL 2026: A Full-Corpus Audit
 
 > **Final report** · 2026-07-21 · tuto.fim.ai
+>
 > Aggregate statistics and anonymized cases only. No paper or author is ever named. There is no author notification or appeal window: the report names no one, so there is nothing to appeal.
 
 > **Central finding: the support measurement does not reproduce.**

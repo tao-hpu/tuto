@@ -9,11 +9,13 @@ export function readReport(name: string): string {
 }
 
 export function Article({ markdown }: { markdown: string }) {
+  let section = 0;
   return (
     <div className="article">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          h2: ({ children }) => <h2 id={`section-${++section}`}>{children}</h2>,
           table: ({ children }) => (
             <div className="table-wrap">
               <table>{children}</table>

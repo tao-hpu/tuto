@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconExternal, IconGitHub, IconSearch } from "@/components/icons";
+import { IconGitHub } from "@/components/icons";
+import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuto.fim.ai"),
   title: {
-    default: "Tuto · Citation integrity, verified",
+    default: "Tuto · Check the citation, read the source",
     template: "%s · Tuto",
   },
   description:
-    "Full-corpus citation integrity audits for NLP venues. Two-stage verification, published false-positive rates, open pipeline.",
+    "An open ACL 2026 citation audit: 209,985 references checked for existence, sampled claims read against cited work, and the replication gap disclosed.",
 };
 
 export default function RootLayout({
@@ -26,30 +27,7 @@ export default function RootLayout({
             <Link href="/" className="wordmark">
               Tuto<span>.</span>
             </Link>
-            <nav className="site-nav">
-              <Link href="/check">
-                <IconSearch className="nav-icon" />
-                Check
-              </Link>
-              <Link href="/report">Report</Link>
-              <a
-                href="https://cito.fim.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Cito
-                <IconExternal className="nav-icon nav-icon-trail" />
-              </a>
-              <a
-                href="https://github.com/fim-ai/tuto"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Tuto on GitHub"
-                className="nav-github"
-              >
-                <IconGitHub className="nav-icon" />
-              </a>
-            </nav>
+            <SiteNav />
           </div>
         </header>
         {children}
@@ -57,7 +35,11 @@ export default function RootLayout({
           <div className="shell">
             <div>
               Tuto · citation auditing by{" "}
-              <a href="https://fim.ai" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://fim.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 fim.ai
               </a>
             </div>
