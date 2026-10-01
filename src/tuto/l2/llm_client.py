@@ -16,10 +16,14 @@ import time
 
 import httpx
 
+# Accept reasoning_effort="none" (measured 2026-10-01): all gpt-5.6, gpt-6-luna, gpt-6-sol.
+# gpt-6.1-sol and gpt-6-astra start at "low" and return 400 on "none".
+_NO_REASONING_PREFIXES = ("gpt-5.6", "gpt-6-luna", "gpt-6-sol")
+
 
 def _openai_new_chat_model(model: str) -> bool:
-    """Official GPT-5 / o-series: no custom temperature, `max_completion_tokens` only."""
-    return model.startswith("gpt-5") or bool(re.match(r"^o[1-4](\b|-)", model))
+    """Official GPT-5 and later / o-series: no custom temperature, `max_completion_tokens` only."""
+    return bool(re.match(r"^gpt-[5-9](?!\d)", model)) or bool(re.match(r"^o[1-4](\b|-)", model))
 
 
 class LLMClient:
@@ -48,7 +52,7 @@ class LLMClient:
         max_tokens must cover REASONING too: Claude and GPT-5 think inside the same
         budget, and a 400-token cap can be fully consumed by reasoning, returning an empty
         content (observed with claude-sonnet-5: 8 of 13 arbiter calls came back blank).
-        Callers using a reasoning model should pass a few thousand. gpt-5.6 is sent
+        Callers using a reasoning model should pass a few thousand. gpt-5.6 / gpt-6-luna / gpt-6-sol are sent
         reasoning_effort=none so the default 400-token judge calls stay usable.
         """
         new_chat = _openai_new_chat_model(self.model)
@@ -66,7 +70,7 @@ class LLMClient:
             body["max_tokens"] = max_tokens
         if not self.model.startswith("claude") and not new_chat:
             body["temperature"] = 0
-        if self.model.startswith("gpt-5.6"):
+        if self.model.startswith(_NO_REASONING_PREFIXES):
             body["reasoning_effort"] = "none"
         for attempt in range(4):
             try:
