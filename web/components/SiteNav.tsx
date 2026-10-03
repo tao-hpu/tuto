@@ -26,7 +26,7 @@ export function SiteNav() {
         Cito <IconExternal className="nav-icon nav-icon-trail" />
       </a>
       <a
-        href="https://github.com/fim-ai/tuto"
+        href="https://github.com/tao-hpu/tuto"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Tuto on GitHub"

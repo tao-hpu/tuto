@@ -45,7 +45,7 @@ export default function RootLayout({
             </div>
             <div className="footer-links">
               <a
-                href="https://github.com/fim-ai/tuto"
+                href="https://github.com/tao-hpu/tuto"
                 target="_blank"
                 rel="noopener noreferrer"
               >
