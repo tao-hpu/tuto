@@ -1064,6 +1064,19 @@ a {
   line-height: 1.55;
 }
 
+.check-paused {
+  margin-top: 2rem;
+  background: var(--bg-raised);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.check-paused a {
+  color: var(--accent-ink);
+}
+
 .check-progress {
   margin-top: 2rem;
   border-top: 1px solid var(--hairline);

@@ -1,6 +1,26 @@
 import type { Metadata } from "next";
 import CheckClient from "./CheckClient";
 
+// The check service (tuto-api + GROBID) is stopped when idle and started on
+// request. Probe it per request so the page follows the service state without a
+// rebuild: reachable -> show the form, unreachable -> show how to request it.
+export const dynamic = "force-dynamic";
+
+const CHECK_API_INTERNAL =
+  process.env.CHECK_API_INTERNAL || "http://tuto-api:8801";
+
+async function checkServiceUp(): Promise<boolean> {
+  try {
+    const r = await fetch(`${CHECK_API_INTERNAL}/healthz`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(1500),
+    });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
 export const metadata: Metadata = {
   title: "Check a paper",
   description:
@@ -8,7 +28,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/check" },
 };
 
-export default function CheckPage() {
+export default async function CheckPage() {
+  const serviceUp = await checkServiceUp();
   return (
     <main>
       <div className="shell check-shell">
@@ -28,7 +49,18 @@ export default function CheckPage() {
               made about them. The result is a review list, not a verdict on the
               author.
             </p>
-            <CheckClient />
+            {serviceUp ? (
+              <CheckClient />
+            ) : (
+              <div className="check-paused" role="status">
+                <p>
+                  The check service is paused. To run a check, email{" "}
+                  <a href="mailto:hi@fim.ai">hi@fim.ai</a> or{" "}
+                  <a href="mailto:tan1@my.hpu.edu">tan1@my.hpu.edu</a> with
+                  the arXiv ID you want audited, and we will turn it back on.
+                </p>
+              </div>
+            )}
           </div>
           <aside className="check-aside" aria-label="What to expect">
             <div className="check-aside-mark" aria-hidden="true">
