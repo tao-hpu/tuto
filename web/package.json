@@ -7,7 +7,7 @@
     "start": "next start -p 5297"
   },
   "dependencies": {
-    "next": "^16.4.2",
+    "next": "16.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.0.0",
