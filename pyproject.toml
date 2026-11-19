@@ -33,11 +33,13 @@ build-backend = "hatchling.build"
 packages = ["src/tuto"]
 
 [tool.uv]
-# Security floor for transitive deps (pdfplumber -> pillow, pdfminer.six -> cryptography).
+# Security floor for transitive deps.
 # pdfplumber allows Pillow>=12.2.0, which still resolves the vulnerable 12.3.0 line.
+# fastapi requires opentelemetry-api>=1.44.0, which still allows 1.45.1 (GHSA-mf5v-w3w3-f6cg).
 constraint-dependencies = [
     "pillow>=13.0.0",
     "cryptography>=50.0.0",
+    "opentelemetry-api>=1.45.2",
 ]
 
 [tool.ruff]
