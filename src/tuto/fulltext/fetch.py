@@ -38,21 +38,26 @@ def make_client() -> httpx.Client:
 
 def _concat_tex(data: bytes) -> str | None:
     """Pull all .tex out of an e-print payload (tar.gz, or a single gzipped .tex)."""
+    opened = False
     try:
-        tf = tarfile.open(fileobj=io.BytesIO(data))
+        with tarfile.open(fileobj=io.BytesIO(data)) as tf:
+            opened = True
+            parts = []
+            for m in tf.getmembers():
+                if m.isfile() and m.name.lower().endswith(".tex"):
+                    f = tf.extractfile(m)
+                    if f:
+                        parts.append(f.read().decode("utf-8", "ignore"))
+            return "\n".join(parts) if parts else None
     except tarfile.TarError:
+        # A failure while reading an opened archive is not a gzip payload.
+        if opened:
+            raise
         try:
             raw = gzip.decompress(data).decode("utf-8", "ignore")
             return raw if "\\" in raw else None
         except OSError:
             return None
-    parts = []
-    for m in tf.getmembers():
-        if m.isfile() and m.name.lower().endswith(".tex"):
-            f = tf.extractfile(m)
-            if f:
-                parts.append(f.read().decode("utf-8", "ignore"))
-    return "\n".join(parts) if parts else None
 
 
 def fetch_arxiv_source(arxiv_id: str, client: httpx.Client, cache_dir: Path) -> str | None:

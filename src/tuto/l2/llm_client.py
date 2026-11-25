@@ -87,8 +87,14 @@ class LLMClient:
                 if isinstance(data, list):  # some models wrap the object in an array
                     data = next((x for x in data if isinstance(x, dict)), None)
                 if not isinstance(data, dict):
-                    raise ValueError("model returned non-object JSON")
+                    raise TypeError("model returned non-object JSON")
                 return data
+            except TypeError as exc:
+                if exc.args != ("model returned non-object JSON",):
+                    raise
+                if attempt == 3:
+                    return None
+                time.sleep(2**attempt)
             except (httpx.HTTPError, KeyError, json.JSONDecodeError, ValueError):
                 if attempt == 3:
                     return None

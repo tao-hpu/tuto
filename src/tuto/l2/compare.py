@@ -58,7 +58,7 @@ def main() -> None:
 
     def row(label: str, fn):
         line = label.ljust(w)
-        for v, r in reports.items():
+        for r in reports.values():
             line += str(fn(r)).ljust(20)
         print(line)
 

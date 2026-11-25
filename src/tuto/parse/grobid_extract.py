@@ -12,7 +12,7 @@ markers, so we make a single pass per PDF.
 from __future__ import annotations
 
 import re
-import xml.etree.ElementTree as ET  # noqa: N817 - element types only; parsing goes through defusedxml
+import xml.etree.ElementTree as ET  # element types only; parsing goes through defusedxml
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
