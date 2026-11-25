@@ -63,7 +63,7 @@ def fetch_remote_md5(client: httpx.Client) -> str:
 
 def download_dump(client: httpx.Client, gz_path: Path, expect_md5: str, quiet: bool) -> None:
     """Stream the dump to disk and verify it against the published md5."""
-    h = hashlib.md5()  # noqa: S324 - integrity against truncation, not a security boundary
+    h = hashlib.md5()  # integrity against truncation, not a security boundary
     tmp = gz_path.with_suffix(gz_path.suffix + ".part")
     with client.stream("GET", DUMP_URL) as r:
         r.raise_for_status()

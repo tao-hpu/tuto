@@ -78,7 +78,12 @@ def build_index(bib_gz: Path, db_path: Path, dtd_path: Path, quiet: bool = False
     )
 
     # lxml resolves the DBLP entities from the DTD sitting next to the (decompressed) stream.
-    parser_kw = dict(load_dtd=True, resolve_entities=True, no_network=True, huge_tree=True)
+    parser_kw = {
+        "load_dtd": True,
+        "resolve_entities": True,
+        "no_network": True,
+        "huge_tree": True,
+    }
     stats = {"records": 0, "with_doi": 0, "skipped_no_title": 0}
     batch: list[tuple] = []
 

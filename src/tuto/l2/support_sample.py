@@ -32,8 +32,8 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from tuto.models import read_jsonl
 from tuto.l2.llm_client import LLMClient
+from tuto.models import read_jsonl
 from tuto.verify.normalize import author_keys, norm_arxiv, norm_doi, norm_title, title_tokens
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -92,9 +92,13 @@ def pick_contexts(venue: str) -> dict[str, dict]:
 
 
 _STOP = frozenset(
-    "the of and for with from a an to in on via using our we this that is are be as by "
-    "towards toward large language model models learning based approach method study "
-    "networks network system systems data analysis new".split()
+    [
+        "the", "of", "and", "for", "with", "from", "a", "an", "to", "in", "on", "via",
+        "using", "our", "we", "this", "that", "is", "are", "be", "as", "by", "towards",
+        "toward", "large", "language", "model", "models", "learning", "based", "approach",
+        "method", "study", "networks", "network", "system", "systems", "data", "analysis",
+        "new",
+    ]
 )
 
 
@@ -194,9 +198,10 @@ def cited_paper(cito, ref: dict) -> dict | None:
         if novel and not (len(novel) == 1 and auth_ok and year_ok):
             continue  # hit title has words this citation never wrote: different paper
         exact = ht == ref_tokens
-        if exact or (c >= 0.7 and (auth_ok or year_ok)) or (c >= 0.5 and auth_ok):
-            if c > best_c:
-                best, best_c = h, c
+        if c > best_c and (
+            exact or (c >= 0.7 and (auth_ok or year_ok)) or (c >= 0.5 and auth_ok)
+        ):
+            best, best_c = h, c
     return best
 
 

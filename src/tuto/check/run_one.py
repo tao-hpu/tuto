@@ -15,9 +15,9 @@ from __future__ import annotations
 import json
 import re
 import shutil
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable
 
 import defusedxml.ElementTree as ET
 import httpx
